@@ -29,4 +29,11 @@ RUN sed -i 's/SGW_IPV4_ADDRESS_FOR_S1U_S12_S4_UP      = "192.168.11.17\/24";/SGW
 
 RUN apt-get install -y vim
 
-CMD ["/RECO/SCRIPTS/run_spgw"]
+RUN echo "#!/bin/bash" > sp.sh
+RUN echo "/RECO/SCRIPTS/run_spgw &" > sp.sh
+RUN echo "sleep 1" > sp.sh
+RUN echo "ps -aux | grep spgw | grep -v grep | awk '{print $2}' | xargs kill" > sp.sh
+RUN echo "/RECO/SCRIPTS/run_spgw" > sp.sh
+
+
+CMD ["sh", "sp.sh"]
