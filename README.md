@@ -21,7 +21,7 @@ docker network create --driver=bridge --subnet=192.188.2.0/24 --gateway=192.188.
 
 ### Run RECO
 
-docker run --ip=192.188.2.4 --net=reco_net -it y51563118/reco_hss (must run hss before mme)
-docker run --ip=192.188.2.2 --net=reco_net -h ubuntu -ti y51563118/reco_mme
-docker run --privileged=true -it -v /lib/modules:/lib/modules --ip=192.188.2.5 --net=reco_net y51563118/reco_spgw
+docker run --ip=192.188.2.4 --net=reco_net -it y51563118/reco_hss (must run hss before mme) </br>
+docker run --ip=192.188.2.2 --net=reco_net -h ubuntu -ti y51563118/reco_mme </br>
+docker run --privileged=true -it -v /lib/modules:/lib/modules --ip=192.188.2.5 --net=reco_net y51563118/reco_spgw </br>
 
