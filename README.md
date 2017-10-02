@@ -6,14 +6,14 @@ This is a tutorial to teach how to install RECO in docker with dockerfiles. (ubu
 
 ### Build docker images
 
-cd install-reco-in-docker/hss/
-docker build -t "reco_hss" .
+cd install-reco-in-docker/hss/ </br>
+docker build -t "reco_hss" . </br>
 
-cd install-reco-in-docker/mme/
-docker build -t "reco_mme" .
+cd install-reco-in-docker/mme/ </br>
+docker build -t "reco_mme" . </br>
 
-cd install-reco-in-docker/spgw/
-docker build -t "reco_spgw" .
+cd install-reco-in-docker/spgw/ </br>
+docker build -t "reco_spgw" . </br>
 
 ### Create docker network
 
