@@ -1,0 +1,40 @@
+FROM ubuntu:14.04
+
+RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y git wget
+
+#build necessary packages
+RUN git clone https://wirelab:wirelab020@gitlab.com/RECONet/RECO.git
+RUN cd RECO/SCRIPTS/ && echo "\n\n\n\n\n" | ./build_hss -F -i
+RUN cd RECO/SCRIPTS/ && echo "\n\n\n\n\n\n\n\n\n\n\n\n\n\n" | ./build_mme -f -i
+
+#config mme
+RUN cd RECO/ETC && cp mme.conf /usr/local/etc/oai && cp mme_fd.conf /usr/local/etc/oai/freeDiameter && chmod 777 /usr/local/etc/oai/mme.conf && chmod 777 /usr/local/etc/oai/freeDiameter/mme_fd.conf
+RUN apt-get install -y libmnl-dev
+
+#build necessary packages
+RUN git clone git://git.osmocom.org/libgtpnl
+RUN cd ./libgtpnl && autoreconf -fi && ./configure && make && make install
+
+#compile mme
+RUN cd RECO/SCRIPTS && ./build_mme -c
+
+#config mme
+RUN sed -i 's/yang.openair4G.eur/ubuntu.openair4G.eur/g' /usr/local/etc/oai/freeDiameter/mme_fd.conf
+RUN echo "ubuntu" > hostname && cp hostname /etc/hostname
+RUN echo "127.0.1.1 ubuntu.openair4G.eur ubuntu" >> /etc/hosts && echo "127.0.0.1 hss.openair4G.eur hss" >> /etc/hosts
+RUN echo "#!/bin/bash" > mme.sh
+RUN echo "/RECO/SCRIPTS/check_mme_s6a_certificate /usr/local/etc/oai/freeDiameter/ ubuntu.openair4G.eur" >> mme.sh
+RUN echo "/RECO/SCRIPTS/run_mme" >> mme.sh
+
+#config network
+RUN sed -i 's/MME_INTERFACE_NAME_FOR_S1_MME         = "ens39";/MME_INTERFACE_NAME_FOR_S1_MME         = "eth0";/g' /usr/local/etc/oai/mme.conf
+RUN sed -i 's/MME_IPV4_ADDRESS_FOR_S1_MME           = "192.188.2.2\/24";/MME_IPV4_ADDRESS_FOR_S1_MME           = "172.18.0.3\/16";/g' /usr/local/etc/oai/mme.conf
+RUN sed -i 's/MME_INTERFACE_NAME_FOR_S11_MME        = "ens37";/MME_INTERFACE_NAME_FOR_S11_MME        = "eth0";/g' /usr/local/etc/oai/mme.conf
+RUN sed -i 's/MME_IPV4_ADDRESS_FOR_S11_MME          = "10.0.0.2\/8";/MME_IPV4_ADDRESS_FOR_S11_MME          = "172.18.0.3\/16";/g' /usr/local/etc/oai/mme.conf
+RUN sed -i 's/SGW_IPV4_ADDRESS_FOR_S11="10.0.0.3\/8";}/SGW_IPV4_ADDRESS_FOR_S11="172.18.0.4\/8";}/g' /usr/local/etc/oai/mme.conf
+RUN sed -i 's/ConnectPeer= "hss.openair4G.eur" { ConnectTo = "127.0.0.1";/ConnectPeer= "hss.openair4G.eur" { ConnectTo = "172.18.0.2";/g' /usr/local/etc/oai/freeDiameter/mme_fd.conf
+
+RUN apt-get install -y vim
+
+CMD ["sh", "mme.sh"]
